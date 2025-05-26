@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreetBot Chatbot</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #9b59b6;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --white: #ffffff;
+            --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --gradient-6: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            --gradient-7: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --gradient-8: linear-gradient(135deg, #ff8a80 0%, #ea6100 100%);
+            --gradient-9: linear-gradient(135deg, #8360c3 0%, #2ebf91 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --border-radius: 20px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gradient-bg);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: var(--white);
+            padding: 20px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .back-button {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .chatbot-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .robot-emoji {
+            font-size: 2.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Main Content */
+        .chatbot-intro {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .chatbot-intro h2 {
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .chatbot-intro p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Questions Grid */
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .question-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            border: 3px solid transparent;
+        }
+
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            transition: var(--transition);
+        }
+
+        .question-card:nth-child(1)::before { background: var(--gradient-1); }
+        .question-card:nth-child(2)::before { background: var(--gradient-2); }
+        .question-card:nth-child(3)::before { background: var(--gradient-3); }
+        .question-card:nth-child(4)::before { background: var(--gradient-4); }
+        .question-card:nth-child(5)::before { background: var(--gradient-5); }
+        .question-card:nth-child(6)::before { background: var(--gradient-6); }
+        .question-card:nth-child(7)::before { background: var(--gradient-7); }
+        .question-card:nth-child(8)::before { background: var(--gradient-8); }
+        .question-card:nth-child(9)::before { background: var(--gradient-9); }
+
+        .question-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .question-card:hover::before {
+            height: 100%;
+            opacity: 0.1;
+        }
+
+        .question-card.playing {
+            border-color: var(--success);
+            background: rgba(46, 204, 113, 0.05);
+        }
+
+        .question-card.playing::before {
+            height: 100%;
+            opacity: 0.2;
+        }
+
+        .question-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .question-subtitle {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Audio Status */
+        .audio-status {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .audio-status.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .audio-status h3 {
+            color: var(--success);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .audio-wave {
+            display: inline-flex;
+            gap: 3px;
+            align-items: center;
+        }
+
+        .wave-bar {
+            width: 4px;
+            height: 20px;
+            background: var(--success);
+            border-radius: 2px;
+            animation: wave 1s infinite ease-in-out;
+        }
+
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes wave {
+            0%, 40%, 100% { transform: scaleY(0.4); }
+            20% { transform: scaleY(1); }
+        }
+
+        /* Control Buttons */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .control-button {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .control-button.stop {
+            background: var(--danger);
+        }
+
+        .control-button.stop:hover {
+            background: #c0392b;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .questions-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .question-card {
+                padding: 25px;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .chatbot-title {
+                font-size: 1.6rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-button" onclick="goBack()">
+                ← Back to Main
+            </button>
+            <h1 class="chatbot-title">
+                <span class="robot-emoji">🤖</span>
+                Chat with GreetBot
+            </h1>
+            <div></div>
+        </div>
+
+        <!-- Chatbot Introduction -->
+        <div class="chatbot-intro">
+            <h2>Hello! I'm GreetBot, your friendly assistant! 👋</h2>
+            <p>Click on any question below to hear my response. I'm here to help you learn about DOT Lebanon, our programs, and today's amazing event!</p>
+        </div>
+
+        <!-- Audio Status -->
+        <div class="audio-status" id="audio-status">
+            <h3>
+                🎵 Playing Audio
+                <div class="audio-wave">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+            </h3>
+            <p id="current-question-text">Playing response...</p>
+            <div class="controls">
+                <button class="control-button stop" onclick="stopAudio()">
+                    ⏹️ Stop Audio
+                </button>
+            </div>
+        </div>
+
+        <!-- Questions Grid -->
+        <div class="questions-grid">
+            <!-- Question 1 -->
+            <div class="question-card" onclick="playAudio(1, this)">
+                <span class="question-icon">🏢</span>
+                <div class="question-text">What is DOT Lebanon?</div>
+                <div class="question-subtitle">Learn about our organization</div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-card" onclick="playAudio(2, this)">
+                <span class="question-icon">🎓</span>
+                <div class="question-text">What is the GIL Program?</div>
+                <div class="question-subtitle">Discover our flagship initiative</div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-card" onclick="playAudio(3, this)">
+                <span class="question-icon">🛡️</span>
+                <div class="question-text">What is online safety?</div>
+                <div class="question-subtitle">Learn about digital protection</div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-card" onclick="playAudio(4, this)">
+                <span class="question-icon">📅</span>
+                <div class="question-text">What's happening today?</div>
+                <div class="question-subtitle">About today's showcase event</div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-card" onclick="playAudio(5, this)">
+                <span class="question-icon">🌟</span>
+                <div class="question-text">What are success stories?</div>
+                <div class="question-subtitle">Hear about our impact</div>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-card" onclick="playAudio(6, this)">
+                <span class="question-icon">🤝</span>
+                <div class="question-text">Who are our partners?</div>
+                <div class="question-subtitle">Meet our collaborators</div>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="question-card" onclick="playAudio(7, this)">
+                <span class="question-icon">💼</span>
+                <div class="question-text">How can I join programs?</div>
+                <div class="question-subtitle">Get involved with us</div>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="question-card" onclick="playAudio(8, this)">
+                <span class="question-icon">🚀</span>
+                <div class="question-text">What skills will I learn?</div>
+                <div class="question-subtitle">Explore our curriculum</div>
+            </div>
+
+            <!-- Question 9 -->
+            <div class="question-card" onclick="playAudio(9, this)">
+                <span class="question-icon">📞</span>
+                <div class="question-text">How can I contact you?</div>
+                <div class="question-subtitle">Get in touch with us</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAudio = null;
+        let currentCard = null;
+
+        // Question texts for display
+        const questionTexts = {
+            1: "What is DOT Lebanon?",
+            2: "What is the GIL Program?", 
+            3: "What is online safety?",
+            4: "What's happening today?",
+            5: "What are success stories?",
+            6: "Who are our partners?",
+            7: "How can I join programs?",
+            8: "What skills will I learn?",
+            9: "How can I contact you?"
+        };
+
+        function goBack() {
+            // Stop any playing audio before going back
+            if (currentAudio) {
+                stopAudio();
+            }
+            
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'ui.html';
+            }
+        }
+
+        function playAudio(questionNumber, cardElement) {
+            // Stop any currently playing audio
+            if (currentAudio) {
+                stopAudio();
+            }
+
+            // Remove playing class from all cards
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.remove('playing');
+            });
+
+            // Add playing class to current card
+            cardElement.classList.add('playing');
+            currentCard = cardElement;
+
+            // Create and play new audio
+            currentAudio = new Audio(`audio${questionNumber}.wav`);
+            
+            // Update status display
+            const statusElement = document.getElementById('audio-status');
+            const questionTextElement = document.getElementById('current-question-text');
+            
+            questionTextElement.textContent = `"${questionTexts[questionNumber]}"`;
+            statusElement.classList.add('active');
+
+            // Play audio
+            currentAudio.play().catch(error => {
+                console.error('Error playing audio:', error);
+                showAudioError(questionNumber);
+            });
+
+            // Handle audio end
+            currentAudio.addEventListener('ended', () => {
+                stopAudio();
+            });
+
+            // Handle audio error
+            currentAudio.addEventListener('error', () => {
+                console.error('Audio file not found:', `audio${questionNumber}.wav`);
+                showAudioError(questionNumber);
+            });
+
+            console.log(`Playing audio${questionNumber}.wav for question: "${questionTexts[questionNumber]}"`);
+        }
+
+        function stopAudio() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                currentAudio = null;
+            }
+
+            // Remove playing class from current card
+            if (currentCard) {
+                currentCard.classList.remove('playing');
+                currentCard = null;
+            }
+
+            // Hide status display
+            const statusElement = document.getElementById('audio-status');
+            statusElement.classList.remove('active');
+
+            console.log('Audio stopped');
+        }
+
+        function showAudioError(questionNumber) {
+            // Remove playing class
+            if (currentCard) {
+                currentCard.classList.remove('playing');
+                currentCard = null;
+            }
+
+            // Hide status display
+            const statusElement = document.getElementById('audio-status');
+            statusElement.classList.remove('active');
+
+            // Show error message
+            alert(`Audio file "audio${questionNumber}.wav" not found. Please make sure the audio files are in the same directory as this HTML file.`);
+            
+            currentAudio = null;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Press Escape to stop audio
+            if (event.key === 'Escape') {
+                stopAudio();
+            }
+            
+            // Press numbers 1-9 to play corresponding audio
+            const num = parseInt(event.key);
+            if (num >= 1 && num <= 9) {
+                const cards = document.querySelectorAll('.question-card');
+                if (cards[num - 1]) {
+                    playAudio(num, cards[num - 1]);
+                }
+            }
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (currentAudio) {
+                stopAudio();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('GreetBot Chatbot loaded successfully');
+            console.log('Audio files expected: audio1.wav through audio9.wav');
+        });
+    </script>
+</body>
+</html>

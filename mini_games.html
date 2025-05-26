@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreetBot Mini Games</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #9b59b6;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --white: #ffffff;
+            --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-card: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --border-radius: 20px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gradient-bg);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: var(--white);
+            padding: 20px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .back-button {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .game-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient-card);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Screen Management */
+        .screen {
+            display: none;
+            flex: 1;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Game Selection Screen */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .game-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .game-card:hover::before {
+            left: 100%;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .game-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .game-description {
+            color: #7f8c8d;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* MCQ Game Styles */
+        .mcq-container {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .question-counter {
+            background: var(--primary);
+            color: var(--white);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .timer {
+            background: var(--danger);
+            color: var(--white);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .question {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--dark);
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            background: var(--light);
+            border: 3px solid transparent;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .option:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateX(10px);
+        }
+
+        .option.selected {
+            background: var(--secondary);
+            color: var(--white);
+            border-color: var(--secondary);
+        }
+
+        .option.correct {
+            background: var(--success);
+            color: var(--white);
+            border-color: var(--success);
+        }
+
+        .option.incorrect {
+            background: var(--danger);
+            color: var(--white);
+            border-color: var(--danger);
+        }
+
+        /* Hangman Styles */
+        .hangman-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        .hangman-drawing {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--light);
+            border-radius: 15px;
+            min-height: 300px;
+            position: relative;
+        }
+
+        .hangman-svg {
+            width: 200px;
+            height: 250px;
+        }
+
+        .hangman-part {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .hangman-part.visible {
+            opacity: 1;
+        }
+
+        .word-display {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 20px 0;
+            letter-spacing: 10px;
+            color: var(--dark);
+        }
+
+        .alphabet {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .letter-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .letter-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .letter-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Reaction Game Styles */
+        .reaction-game {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: relative;
+            min-height: 500px;
+        }
+
+        .reaction-area {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: var(--light);
+            border-radius: 15px;
+            margin: 20px 0;
+            cursor: crosshair;
+        }
+
+        .reaction-circle {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: var(--danger);
+            border-radius: 50%;
+            cursor: pointer;
+            animation: pulse 1s infinite;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .reaction-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: var(--gradient-card);
+            color: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Leaderboard */
+        .leaderboard {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+
+        .leaderboard h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: var(--light);
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .leaderboard-item:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .rank {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Buttons */
+        .game-button {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            margin: 10px;
+        }
+
+        .game-button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .game-button.success {
+            background: var(--success);
+        }
+
+        .game-button.danger {
+            background: var(--danger);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hangman-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .alphabet {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .reaction-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-button" onclick="goBack()">
+                ← Back to Main
+            </button>
+            <h1 class="game-title">🎮 Mini Games</h1>
+            <div></div>
+        </div>
+
+        <!-- Game Selection Screen -->
+        <div id="game-selection" class="screen active">
+            <div class="games-grid">
+                <div class="game-card" onclick="startGame('mcq')">
+                    <span class="game-icon">🧠</span>
+                    <h3>MCQ Challenge</h3>
+                    <p class="game-description">Test your knowledge with 5 exciting questions. Race against time!</p>
+                </div>
+                
+                <div class="game-card" onclick="startGame('hangman')">
+                    <span class="game-icon">🎯</span>
+                    <h3>Hangman</h3>
+                    <p class="game-description">Guess the word before the hangman is complete. 3 challenging words await!</p>
+                </div>
+                
+                <div class="game-card" onclick="startGame('reaction')">
+                    <span class="game-icon">⚡</span>
+                    <h3>Reaction Game</h3>
+                    <p class="game-description">Test your reflexes! Click the circles as fast as you can and climb the leaderboard!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCQ Game Screen -->
+        <div id="mcq-game" class="screen">
+            <div class="mcq-container">
+                <div class="question-header">
+                    <div class="question-counter">Question <span id="current-question">1</span> of 5</div>
+                    <div class="timer">Time: <span id="timer">30</span>s</div>
+                </div>
+                
+                <div class="question" id="question-text">Loading question...</div>
+                
+                <div class="options" id="options-container">
+                    <!-- Options will be populated by JavaScript -->
+                </div>
+                
+                <div style="text-align: center;">
+                    <button class="game-button" onclick="nextQuestion()" id="next-btn" style="display: none;">Next Question</button>
+                    <button class="game-button success" onclick="showMCQResults()" id="finish-btn" style="display: none;">Finish Quiz</button>
+                    <button class="game-button danger" onclick="showScreen('game-selection')">Back to Games</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hangman Game Screen -->
+        <div id="hangman-game" class="screen">
+            <div class="hangman-container">
+                <div class="hangman-drawing">
+                    <svg class="hangman-svg" viewBox="0 0 200 250">
+                        <!-- Gallows -->
+                        <line x1="10" y1="230" x2="150" y2="230" stroke="#8B4513" stroke-width="4"/>
+                        <line x1="30" y1="230" x2="30" y2="20" stroke="#8B4513" stroke-width="4"/>
+                        <line x1="30" y1="20" x2="120" y2="20" stroke="#8B4513" stroke-width="4"/>
+                        <line x1="120" y1="20" x2="120" y2="50" stroke="#8B4513" stroke-width="4"/>
+                        
+                        <!-- Hangman parts -->
+                        <circle id="head" class="hangman-part" cx="120" cy="60" r="10" stroke="#2c3e50" stroke-width="3" fill="none"/>
+                        <line id="body" class="hangman-part" x1="120" y1="70" x2="120" y2="150" stroke="#2c3e50" stroke-width="3"/>
+                        <line id="leftArm" class="hangman-part" x1="120" y1="90" x2="100" y2="110" stroke="#2c3e50" stroke-width="3"/>
+                        <line id="rightArm" class="hangman-part" x1="120" y1="90" x2="140" y2="110" stroke="#2c3e50" stroke-width="3"/>
+                        <line id="leftLeg" class="hangman-part" x1="120" y1="150" x2="100" y2="180" stroke="#2c3e50" stroke-width="3"/>
+                        <line id="rightLeg" class="hangman-part" x1="120" y1="150" x2="140" y2="180" stroke="#2c3e50" stroke-width="3"/>
+                    </svg>
+                </div>
+                
+                <div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h3>Guess the Word!</h3>
+                        <p>Wrong guesses: <span id="wrong-count">0</span>/6</p>
+                    </div>
+                    
+                    <div class="word-display" id="word-display">_ _ _ _ _</div>
+                    
+                    <div class="alphabet" id="alphabet">
+                        <!-- Letters will be populated by JavaScript -->
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="game-button" onclick="newHangmanGame()">New Word</button>
+                        <button class="game-button danger" onclick="showScreen('game-selection')">Back to Games</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reaction Game Screen -->
+        <div id="reaction-game" class="screen">
+            <div class="reaction-game">
+                <h3>Reaction Time Challenge</h3>
+                <p>Click 5 red circles as fast as you can!</p>
+                
+                <div class="reaction-area" id="reaction-area">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; color: #7f8c8d;" id="reaction-message">
+                        Click "Start Game" to begin!
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button class="game-button" onclick="startReactionGame()" id="start-reaction-btn">Start Game</button>
+                    <button class="game-button danger" onclick="stopReactionGame()" id="stop-reaction-btn" style="display: none;">Stop Game</button>
+                    <button class="game-button" onclick="showScreen('game-selection')">Back to Games</button>
+                </div>
+                
+                <div class="reaction-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="hits-count">0</div>
+                        <div class="stat-label">Hits</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avg-time">0ms</div>
+                        <div class="stat-label">Avg Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="best-time">0ms</div>
+                        <div class="stat-label">Best Time</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Leaderboard -->
+            <div class="leaderboard">
+                <h3>🏆 Top Scores</h3>
+                <div id="leaderboard-list">
+                    <!-- Leaderboard items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global game state
+        let currentScreen = 'game-selection';
+        let gameState = {
+            mcq: {
+                currentQuestion: 0,
+                score: 0,
+                timer: 30,
+                timerInterval: null,
+                questions: [
+                    {
+                        question: "What does DOT Lebanon focus on?",
+                        options: ["Digital Skills Training", "Cooking Classes", "Sports Training", "Music Lessons"],
+                        correct: 0
+                    },
+                    {
+                        question: "What is the main goal of GIL program?",
+                        options: ["Entertainment", "Digital Literacy & Innovation", "Physical Fitness", "Language Learning"],
+                        correct: 1
+                    },
+                    {
+                        question: "Which organization partners with DOT Lebanon for online safety?",
+                        options: ["WHO", "UNESCO", "OXFAM", "UNICEF"],
+                        correct: 2
+                    },
+                    {
+                        question: "What does NOMU project focus on?",
+                        options: ["Gaming", "Digital Skills for Youth", "Cooking", "Dancing"],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the venue for the GIL showcase event?",
+                        options: ["AUB", "BDD Room 1280", "LAU", "USJ"],
+                        correct: 1
+                    }
+                ]
+            },
+            hangman: {
+                words: ['DOTLEBANON', 'GILUNICEF', 'BDDEVENT'],
+                currentWord: '',
+                guessedWord: [],
+                wrongGuesses: 0,
+                maxWrong: 6,
+                guessedLetters: []
+            },
+            reaction: {
+                isPlaying: false,
+                hits: 0,
+                startTime: 0,
+                reactionTimes: [],
+                gameInterval: null,
+                currentCircle: null
+            }
+        };
+
+        // Screen management
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            currentScreen = screenId;
+        }
+
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'ui.html';
+            }
+        }
+
+        function startGame(gameType) {
+            switch(gameType) {
+                case 'mcq':
+                    initMCQGame();
+                    showScreen('mcq-game');
+                    break;
+                case 'hangman':
+                    initHangmanGame();
+                    showScreen('hangman-game');
+                    break;
+                case 'reaction':
+                    showScreen('reaction-game');
+                    updateLeaderboard();
+                    break;
+            }
+        }
+
+        // MCQ Game Functions
+        function initMCQGame() {
+            gameState.mcq.currentQuestion = 0;
+            gameState.mcq.score = 0;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const mcq = gameState.mcq;
+            const question = mcq.questions[mcq.currentQuestion];
+            
+            document.getElementById('current-question').textContent = mcq.currentQuestion + 1;
+            document.getElementById('question-text').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            startTimer();
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('finish-btn').style.display = 'none';
+        }
+
+        function startTimer() {
+            gameState.mcq.timer = 15;
+            updateTimerDisplay();
+            
+            gameState.mcq.timerInterval = setInterval(() => {
+                gameState.mcq.timer--;
+                updateTimerDisplay();
+                
+                if (gameState.mcq.timer <= 0) {
+                    clearInterval(gameState.mcq.timerInterval);
+                    timeUp();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('timer').textContent = gameState.mcq.timer;
+        }
+
+        function selectOption(selectedIndex) {
+            clearInterval(gameState.mcq.timerInterval);
+            
+            const question = gameState.mcq.questions[gameState.mcq.currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach((option, index) => {
+                option.onclick = null;
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === question.correct) {
+                gameState.mcq.score++;
+            }
+            
+            setTimeout(() => {
+                if (gameState.mcq.currentQuestion < gameState.mcq.questions.length - 1) {
+                    document.getElementById('next-btn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('finish-btn').style.display = 'inline-block';
+                }
+            }, 1500);
+        }
+
+        function timeUp() {
+            const options = document.querySelectorAll('.option');
+            const question = gameState.mcq.questions[gameState.mcq.currentQuestion];
+            
+            options.forEach((option, index) => {
+                option.onclick = null;
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                }
+            });
+            
+            setTimeout(() => {
+                if (gameState.mcq.currentQuestion < gameState.mcq.questions.length - 1) {
+                    document.getElementById('next-btn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('finish-btn').style.display = 'inline-block';
+                }
+            }, 1500);
+        }
+
+        function nextQuestion() {
+            gameState.mcq.currentQuestion++;
+            loadQuestion();
+        }
+
+        function showMCQResults() {
+            const score = gameState.mcq.score;
+            const total = gameState.mcq.questions.length;
+            const percentage = Math.round((score / total) * 100);
+            
+            alert(`Quiz Complete!\n\nYour Score: ${score}/${total} (${percentage}%)\n\n${getScoreMessage(percentage)}`);
+            showScreen('game-selection');
+        }
+
+        function getScoreMessage(percentage) {
+            if (percentage >= 80) return "Excellent! You're a digital champion! 🏆";
+            if (percentage >= 60) return "Great job! Keep learning! 🌟";
+            if (percentage >= 40) return "Good effort! Practice makes perfect! 💪";
+            return "Keep trying! You'll get better! 🚀";
+        }
+
+        // Hangman Game Functions
+        function initHangmanGame() {
+            const hangman = gameState.hangman;
+            hangman.currentWord = hangman.words[Math.floor(Math.random() * hangman.words.length)];
+            hangman.guessedWord = Array(hangman.currentWord.length).fill('_');
+            hangman.wrongGuesses = 0;
+            hangman.guessedLetters = [];
+            
+            updateHangmanDisplay();
+            createAlphabet();
+            resetHangmanDrawing();
+        }
+
+        function createAlphabet() {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const alphabetContainer = document.getElementById('alphabet');
+            alphabetContainer.innerHTML = '';
+            
+            for (let letter of alphabet) {
+                const button = document.createElement('button');
+                button.className = 'letter-btn';
+                button.textContent = letter;
+                button.onclick = () => guessLetter(letter, button);
+                alphabetContainer.appendChild(button);
+            }
+        }
+
+        function guessLetter(letter, button) {
+            const hangman = gameState.hangman;
+            
+            if (hangman.guessedLetters.includes(letter)) return;
+            
+            hangman.guessedLetters.push(letter);
+            button.disabled = true;
+            
+            if (hangman.currentWord.includes(letter)) {
+                // Correct guess
+                for (let i = 0; i < hangman.currentWord.length; i++) {
+                    if (hangman.currentWord[i] === letter) {
+                        hangman.guessedWord[i] = letter;
+                    }
+                }
+                
+                if (!hangman.guessedWord.includes('_')) {
+                    setTimeout(() => {
+                        alert('Congratulations! You won! 🎉');
+                        newHangmanGame();
+                    }, 500);
+                }
+            } else {
+                // Wrong guess
+                hangman.wrongGuesses++;
+                showHangmanPart(hangman.wrongGuesses);
+                
+                if (hangman.wrongGuesses >= hangman.maxWrong) {
+                    setTimeout(() => {
+                        alert(`Game Over! The word was: ${hangman.currentWord}`);
+                        newHangmanGame();
+                    }, 500);
+                }
+            }
+            
+            updateHangmanDisplay();
+        }
+
+        function updateHangmanDisplay() {
+            const hangman = gameState.hangman;
+            document.getElementById('word-display').textContent = hangman.guessedWord.join(' ');
+            document.getElementById('wrong-count').textContent = hangman.wrongGuesses;
+        }
+
+        function showHangmanPart(partNumber) {
+            const parts = ['head', 'body', 'leftArm', 'rightArm', 'leftLeg', 'rightLeg'];
+            if (partNumber <= parts.length) {
+                document.getElementById(parts[partNumber - 1]).classList.add('visible');
+            }
+        }
+
+        function resetHangmanDrawing() {
+            const parts = ['head', 'body', 'leftArm', 'rightArm', 'leftLeg', 'rightLeg'];
+            parts.forEach(part => {
+                document.getElementById(part).classList.remove('visible');
+            });
+        }
+
+        function newHangmanGame() {
+            initHangmanGame();
+        }
+
+        // Reaction Game Functions
+        function startReactionGame() {
+            const reaction = gameState.reaction;
+            reaction.isPlaying = true;
+            reaction.hits = 0;
+            reaction.reactionTimes = [];
+            
+            document.getElementById('start-reaction-btn').style.display = 'none';
+            document.getElementById('stop-reaction-btn').style.display = 'inline-block';
+            document.getElementById('reaction-message').style.display = 'none';
+            
+            updateReactionStats();
+            spawnCircle();
+        }
+
+        function spawnCircle() {
+            if (!gameState.reaction.isPlaying) return;
+            
+            const reactionArea = document.getElementById('reaction-area');
+            const circle = document.createElement('div');
+            circle.className = 'reaction-circle';
+            
+            const maxX = reactionArea.offsetWidth - 60;
+            const maxY = reactionArea.offsetHeight - 60;
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+            
+            circle.style.left = x + 'px';
+            circle.style.top = y + 'px';
+            
+            gameState.reaction.startTime = Date.now();
+            gameState.reaction.currentCircle = circle;
+            
+            circle.onclick = () => hitCircle();
+            reactionArea.appendChild(circle);
+            
+            // Remove circle after 3 seconds if not clicked
+            setTimeout(() => {
+                if (circle.parentNode) {
+                    circle.remove();
+                    if (gameState.reaction.isPlaying) {
+                        setTimeout(() => spawnCircle(), Math.random() * 2000 + 1000);
+                    }
+                }
+            }, 3000);
+        }
+
+        function hitCircle() {
+            const reaction = gameState.reaction;
+            const reactionTime = Date.now() - reaction.startTime;
+            
+            reaction.hits++;
+            reaction.reactionTimes.push(reactionTime);
+            
+            if (reaction.currentCircle) {
+                reaction.currentCircle.remove();
+            }
+            
+            updateReactionStats();
+            
+            // Check if we've reached 5 hits
+            if (reaction.hits >= 5) {
+                stopReactionGame();
+                return;
+            }
+            
+            // Spawn next circle after delay
+            setTimeout(() => spawnCircle(), Math.random() * 2000 + 1000);
+        }
+
+        function updateReactionStats() {
+            const reaction = gameState.reaction;
+            
+            document.getElementById('hits-count').textContent = reaction.hits;
+            
+            if (reaction.reactionTimes.length > 0) {
+                const avgTime = Math.round(reaction.reactionTimes.reduce((a, b) => a + b) / reaction.reactionTimes.length);
+                const bestTime = Math.min(...reaction.reactionTimes);
+                
+                document.getElementById('avg-time').textContent = avgTime + 'ms';
+                document.getElementById('best-time').textContent = bestTime + 'ms';
+            }
+        }
+
+        function stopReactionGame() {
+            const reaction = gameState.reaction;
+            reaction.isPlaying = false;
+            
+            if (reaction.currentCircle) {
+                reaction.currentCircle.remove();
+            }
+            
+            document.getElementById('start-reaction-btn').style.display = 'inline-block';
+            document.getElementById('stop-reaction-btn').style.display = 'none';
+            document.getElementById('reaction-message').style.display = 'block';
+            
+            // Save score to leaderboard
+            if (reaction.hits > 0) {
+                if (reaction.hits >= 5) {
+                    const avgTime = Math.round(reaction.reactionTimes.reduce((a, b) => a + b) / reaction.reactionTimes.length);
+                    document.getElementById('reaction-message').textContent = `Game Complete! Final Score: ${reaction.hits} hits with ${avgTime}ms average time!`;
+                } else {
+                    document.getElementById('reaction-message').textContent = 'Game Over! Click "Start Game" to play again.';
+                }
+                saveReactionScore();
+                updateLeaderboard();
+            } else {
+                document.getElementById('reaction-message').textContent = 'Game Over! Click "Start Game" to play again.';
+            }
+        }
+
+        function saveReactionScore() {
+            const reaction = gameState.reaction;
+            const avgTime = Math.round(reaction.reactionTimes.reduce((a, b) => a + b) / reaction.reactionTimes.length);
+            
+            const scores = JSON.parse(localStorage.getItem('reactionScores') || '[]');
+            scores.push({
+                hits: reaction.hits,
+                avgTime: avgTime,
+                date: new Date().toLocaleDateString()
+            });
+            
+            scores.sort((a, b) => {
+                if (b.hits !== a.hits) return b.hits - a.hits;
+                return a.avgTime - b.avgTime;
+            });
+            
+            localStorage.setItem('reactionScores', JSON.stringify(scores.slice(0, 5)));
+        }
+
+        function updateLeaderboard() {
+            const scores = JSON.parse(localStorage.getItem('reactionScores') || '[]');
+            const leaderboardList = document.getElementById('leaderboard-list');
+            
+            if (scores.length === 0) {
+                leaderboardList.innerHTML = '<div style="text-align: center; color: #7f8c8d;">No scores yet. Play to set a record!</div>';
+                return;
+            }
+            
+            leaderboardList.innerHTML = '';
+            scores.forEach((score, index) => {
+                const item = document.createElement('div');
+                item.className = 'leaderboard-item';
+                item.innerHTML = `
+                    <span class="rank">#${index + 1}</span>
+                    <span>${score.hits} hits</span>
+                    <span>${score.avgTime}ms avg</span>
+                `;
+                leaderboardList.appendChild(item);
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Mini Games loaded successfully');
+        });
+    </script>
+</body>
+</html>

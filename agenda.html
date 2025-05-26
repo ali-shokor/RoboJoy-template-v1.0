@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIL Program Showcase - Event Agenda</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --purple: #9b59b6;
+            --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --text-white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --border-radius: 16px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Section */
+        .event-header {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--secondary), var(--purple), var(--accent));
+        }
+
+        .event-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--secondary), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .event-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 25px;
+        }
+
+        .event-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .detail-card {
+            background: linear-gradient(135deg, var(--secondary), var(--purple));
+            color: var(--text-white);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .detail-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Back Button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            color: var(--secondary);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            background: var(--secondary);
+            color: var(--text-white);
+        }
+
+        /* Timeline Styles */
+        .timeline-container {
+            position: relative;
+            margin-top: 40px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--secondary), var(--purple), var(--accent));
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .timeline-item:hover {
+            transform: translateX(10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -37px;
+            top: 25px;
+            width: 16px;
+            height: 16px;
+            background: var(--secondary);
+            border: 4px solid var(--card-bg);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px var(--secondary);
+        }
+
+        .timeline-item.success::before {
+            background: var(--success);
+            box-shadow: 0 0 0 4px var(--success);
+        }
+
+        .timeline-item.warning::before {
+            background: var(--warning);
+            box-shadow: 0 0 0 4px var(--warning);
+        }
+
+        .timeline-item.accent::before {
+            background: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent);
+        }
+
+        .timeline-content {
+            padding: 25px 30px;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .activity-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            background: linear-gradient(135deg, var(--secondary), var(--purple));
+            color: var(--text-white);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .activity-description {
+            color: var(--text-light);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .activity-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(127, 140, 141, 0.1);
+            color: var(--text-light);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-light);
+        }
+
+        /* Special Styling for Different Activity Types */
+        .timeline-item.keynote {
+            border-left: 5px solid var(--accent);
+        }
+
+        .timeline-item.success-story {
+            border-left: 5px solid var(--success);
+        }
+
+        .timeline-item.panel {
+            border-left: 5px solid var(--purple);
+        }
+
+        .timeline-item.networking {
+            border-left: 5px solid var(--warning);
+        }
+
+        /* Duration Badge */
+        .duration-badge {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--secondary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .event-title {
+                font-size: 2rem;
+            }
+
+            .event-details {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline {
+                padding-left: 20px;
+            }
+
+            .timeline-item::before {
+                left: -27px;
+            }
+
+            .timeline-content {
+                padding: 20px;
+            }
+
+            .timeline-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .activity-title {
+                font-size: 1.2rem;
+            }
+
+            .back-button {
+                position: relative;
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .timeline-item {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .timeline-item:nth-child(even) {
+            animation-delay: 0.1s;
+        }
+
+        .timeline-item:nth-child(odd) {
+            animation-delay: 0.2s;
+        }
+
+        /* Print Styles */
+        @media print {
+            .back-button {
+                display: none;
+            }
+            
+            .timeline-item {
+                break-inside: avoid;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="goBack()">
+        ← Back to Main
+    </button>
+
+    <div class="container">
+        <!-- Event Header -->
+        <div class="event-header">
+            <h1 class="event-title">GIL of Innovation</h1>
+            <p class="event-subtitle">Empowered as one, Secured Online, Skilled for what's next</p>
+            
+            <div class="event-details">
+                <div class="detail-card">
+                    <span class="detail-icon">🏢</span>
+                    <div class="detail-label">Organized by</div>
+                    <div class="detail-value">DOT Lebanon</div>
+                </div>
+                <div class="detail-card">
+                    <span class="detail-icon">📅</span>
+                    <div class="detail-label">Date</div>
+                    <div class="detail-value">June 11th, 2025</div>
+                </div>
+                <div class="detail-card">
+                    <span class="detail-icon">📍</span>
+                    <div class="detail-label">Venue</div>
+                    <div class="detail-value">BDD Room 1280</div>
+                </div>
+                <div class="detail-card">
+                    <span class="detail-icon">⏰</span>
+                    <div class="detail-label">Duration</div>
+                    <div class="detail-value">10:00 AM - 5:00 PM</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline-container">
+            <div class="timeline">
+                
+                <!-- Mini Job Fair -->
+                <div class="timeline-item networking">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🎯 Mini Job Fair or Open Day</h3>
+                            </div>
+                            <div class="activity-time">10:00 AM</div>
+                        </div>
+                        <p class="activity-description">
+                            Opening networking session and job fair opportunities for participants.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Guests Entry -->
+                <div class="timeline-item keynote">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🤖 Guests Entry & Robot Greeting</h3>
+                            </div>
+                            <div class="activity-time">2:00 PM</div>
+                        </div>
+                        <p class="activity-description">
+                            Mini Job Fair will stop till the end of the event. Robots will be greeting and welcoming the guests and filling their information.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Welcoming Guests -->
+                <div class="timeline-item keynote">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">👋 Welcoming Guests</h3>
+                            </div>
+                            <div class="activity-time">3:00 PM</div>
+                        </div>
+                        <p class="activity-description">
+                            DOT Lebanon representative will welcome all the guests on stage and give a brief about the event.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- UNICEF Speech -->
+                <div class="timeline-item keynote">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🌟 UNICEF Speech</h3>
+                            </div>
+                            <div class="activity-time">3:05 PM <span class="duration-badge">5 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            UNICEF representative speech highlighting their partnership and support.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- AGF Speech -->
+                <div class="timeline-item keynote">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🏛️ AGF Speech</h3>
+                            </div>
+                            <div class="activity-time">3:10 PM <span class="duration-badge">5 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            AGF Representative speech on their commitment to digital innovation and youth empowerment.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- DOT Lebanon Speech -->
+                <div class="timeline-item keynote">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🎤 DOT Lebanon Speech</h3>
+                            </div>
+                            <div class="activity-time">3:15 PM <span class="duration-badge">5 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            Dounya Bassil, DOT Lebanon country director speech on the organization's mission and impact.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Recap Videos -->
+                <div class="timeline-item success-story">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🎬 Recap Videos for Impact</h3>
+                            </div>
+                            <div class="activity-time">3:20 PM <span class="duration-badge">5 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            A video that gathers many actual success stories: Lebanese Montessori Club, Nancy Owayjan (GIL), Elsie Issaa (Nomu).
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Success Story 1 - Dalia -->
+                <div class="timeline-item success-story">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🌟 Success Story 1 - Dalia</h3>
+                            </div>
+                            <div class="activity-time">3:25 PM <span class="duration-badge">5 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            Dalia joined GIL courses with limited experience but a passion for creativity and digital communication. Through dedication, she gained valuable skills in graphic design and social media management, which enhanced both her career and university projects. She quickly transitioned to freelancing and secured a position as a Social Media Manager & Graphic Designer at a well-known company.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Success Story 2 - FireBot -->
+                <div class="timeline-item success-story">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🔥 Success Story 2 - FireBot</h3>
+                            </div>
+                            <div class="activity-time">3:30 PM <span class="duration-badge">5 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            FireBot is a smart self-driving vehicle equipped with infrared and smoke sensors. It can automatically detect and extinguish fires by spraying water or specialized extinguishing materials. The main goal is to save the lives of firefighters and reduce risks. They won the 1st prize GIL National Startup competition.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Success Story 3 - TruthLens -->
+                <div class="timeline-item success-story">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🔍 Success Story 3 - TruthLens</h3>
+                            </div>
+                            <div class="activity-time">3:35 PM <span class="duration-badge">5 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            TruthLens is a web-based project built to help users detect and verify potentially misleading or false information online. It serves as an educational tool for raising awareness around fake news, featuring visual aids, links to trusted verification platforms and AI chatbot to assist users effectively.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Success Story 4 - Jinan -->
+                <div class="timeline-item success-story">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">💼 Success Story 4 - Jinan Saeed</h3>
+                            </div>
+                            <div class="activity-time">3:40 PM <span class="duration-badge">5 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            Jinan Saeed (NOMU Success Story) - A inspiring journey of digital transformation and career advancement.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Success Story 5 - Malak -->
+                <div class="timeline-item success-story">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🛡️ Success Story 5 - Malak</h3>
+                            </div>
+                            <div class="activity-time">3:45 PM <span class="duration-badge">5 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            Malak (Safe Side Organization - Nomu Success Story) - Demonstrating the impact of online safety and digital literacy programs.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- OXFAM Manual -->
+                <div class="timeline-item keynote">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">📚 Online Protection Manual (OXFAM)</h3>
+                            </div>
+                            <div class="activity-time">3:50 PM <span class="duration-badge">15 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            Announcing the online protection manual with OXFAM - A comprehensive guide for digital safety and security.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Panel Discussion -->
+                <div class="timeline-item panel">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🎯 Panel Discussion</h3>
+                            </div>
+                            <div class="activity-time">4:05 PM <span class="duration-badge">45 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            <strong>Talent in Transition: Digital Skills, Market Realities, and Inclusive and Safe Solutions.</strong><br>
+                            Discussion topics: What are the challenges? How about the new demands, new needs and any supply targeting vulnerable populations?
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Gift Distribution -->
+                <div class="timeline-item networking">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🎁 Gift Distribution</h3>
+                            </div>
+                            <div class="activity-time">4:50 PM <span class="duration-badge">10 min</span></div>
+                        </div>
+                        <p class="activity-description">
+                            Distribution of participants thank you gifts on stage and announcing them. We will distribute participation gifts to the participant youths in the preparations and announce them on stage.
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+                <!-- End of Event -->
+                <div class="timeline-item accent">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <div>
+                                <h3 class="activity-title">🎉 End of Event</h3>
+                            </div>
+                            <div class="activity-time">5:00 PM</div>
+                        </div>
+                        <p class="activity-description">
+                            Closing remarks and networking opportunities. Thank you for joining us!
+                        </p>
+                        <span class="activity-status">
+                            <span class="status-indicator"></span>
+                            Not Started
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            // Check if we came from the main UI
+            if (document.referrer.includes('ui.html') || window.history.length > 1) {
+                window.history.back();
+            } else {
+                // Fallback to main UI
+                window.location.href = 'ui.html';
+            }
+        }
+
+        // Add smooth scrolling for better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate timeline items on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all timeline items
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(30px)';
+                item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(item);
+            });
+
+            console.log('GIL Event Agenda loaded successfully');
+        });
+
+        // Add click handlers for timeline items (for future interactivity)
+        document.querySelectorAll('.timeline-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Future: Could show more details or mark as completed
+                console.log('Timeline item clicked:', this.querySelector('.activity-title').textContent);
+            });
+        });
+
+        // Auto-refresh status (if connected to backend)
+        function updateEventStatus() {
+            // Future: Fetch real-time status updates
+            console.log('Checking event status...');
+        }
+
+        // Update status every 30 seconds
+        setInterval(updateEventStatus, 30000);
+    </script>
+</body>
+</html>

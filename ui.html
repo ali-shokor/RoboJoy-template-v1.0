@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreetBot Interface</title>
+    <style>
+        :root {
+            --purple: #9b59b6;
+            --purple-dark: #8e44ad;
+            --yellow: #f1c40f;
+            --yellow-dark: #f39c12;
+            --green: #2ecc71;
+            --green-dark: #27ae60;
+            --red: #e74c3c;
+            --red-dark: #c0392b;
+            --blue: #3498db;
+            --blue-dark: #2980b9;
+            --background: #ecf0f1;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 12px 35px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #bdc3c7 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-emoji {
+            font-size: 2.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--blue), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+
+        .battery-icon {
+            font-size: 1.2rem;
+            color: var(--green);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            display: none;
+        }
+
+        .main-content.active {
+            display: block;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card:active {
+            transform: translateY(-4px) scale(0.98);
+        }
+
+        .card-header {
+            padding: 25px 20px;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .card:hover .card-header::before {
+            left: 100%;
+        }
+
+        .card-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .card-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card-icon {
+            font-size: 4rem;
+            transition: var(--transition);
+        }
+
+        .card:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Card Color Themes */
+        .card.games .card-header { background: linear-gradient(135deg, var(--purple), var(--purple-dark)); }
+        .card.agenda .card-header { background: linear-gradient(135deg, var(--yellow), var(--yellow-dark)); }
+        .card.chatbot .card-header { background: linear-gradient(135deg, var(--green), var(--green-dark)); }
+        .card.greeting .card-header { background: linear-gradient(135deg, var(--red), var(--red-dark)); }
+
+        /* Nested Screens */
+        .screen {
+            display: none;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .screen-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .screen-header h2 {
+            font-size: 1.8rem;
+            color: var(--text);
+        }
+
+        .back-button {
+            background: var(--blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: var(--blue-dark);
+            transform: translateX(-3px);
+        }
+
+        .screen-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-light);
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        /* Reset Button */
+        .reset-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .reset-button {
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reset-button:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .reset-button:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .logo h1 {
+                font-size: 1.6rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .card {
+                height: 180px;
+            }
+
+            .card-icon {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .screen {
+                padding: 20px;
+            }
+
+            .screen-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <span class="logo-emoji">🤖</span>
+                <h1>GreetBot Interface</h1>
+            </div>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-indicator"></span>
+                    <span id="robot-mode">Mode: Idle</span>
+                </div>
+                <div class="status-item">
+                    <span class="battery-icon">🔋</span>
+                    <span>Battery: 85%</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div id="main-screen" class="main-content active">
+            <a href="mini_games.html" class="href">
+            <div class="cards-grid">
+                <!-- Games Card -->
+                <div class="card games">
+                    <div class="card-header">
+                        <h2>🕹️ Mini Games</h2>
+                        <div class="card-subtitle">Play fun interactive games</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-icon">🎮</div>
+                    </div>
+                </div>
+                </a>
+                <!-- Agenda Card -->
+                 <a href="agenda.html" class="href">
+                <div class="card agenda">
+                    <div class="card-header">
+                        <h2>📅 Event Agenda</h2>
+                        <div class="card-subtitle">View today's schedule</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-icon">📅</div>
+                    </div>
+                </div>
+                </a>
+
+                <!-- Chatbot Card -->
+                 <a href="chatbot.html" class="href">
+                <div class="card chatbot" >
+                    <div class="card-header">
+                        <h2>💬 Chat with Me</h2>
+                        <div class="card-subtitle">Ask questions or chat</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-icon">💬</div>
+                    </div>
+                </div>
+                </a>
+                <!-- Greeting Card -->
+                <!-- <div class="card greeting" onclick="replayGreeting()">
+                    <div class="card-header">
+                        <h2>👋 Greeting</h2>
+                        <div class="card-subtitle">Replay greeting message</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-icon">👋</div>
+                    </div>
+                </div> -->
+            </div>
+
+            <!-- Reset Button -->
+            <div class="reset-section">
+                <button class="reset-button" onclick="endTalk()">
+                    🔁 End of Talk
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Selection Screen -->
+        <div id="game-selection" class="screen">
+            <div class="screen-header">
+                <button class="back-button" onclick="showScreen('main-screen')">
+                    ← Back
+                </button>
+                <h2>🎮 Mini Games</h2>
+            </div>
+            <div class="screen-content">
+                <p>🎯 Choose from our exciting collection of games!</p>
+                <p>Games will be available soon. Stay tuned for updates!</p>
+            </div>
+        </div>
+
+        <!-- Agenda Screen -->
+        <!-- <div id="agenda-screen" class="screen" onclick="window.location.href='/robot/agenda' " >
+            <div class="screen-header">
+                <button class="back-button" >
+                    ← Back
+                </button>
+                <h2>📅 Event Agenda</h2>
+            </div>
+            <div class="screen-content">
+                <p>📋 Here's what's happening today:</p>
+                <p>Event schedule will be displayed here once configured.</p>
+            </div>
+        </div> -->
+
+        <!-- Chatbot Screen -->
+        <div id="chatbot-screen" class="screen">
+            <div class="screen-header">
+                <button class="back-button" onclick="showScreen('main-screen')">
+                    ← Back
+                </button>
+                <h2>💬 Chat with GreetBot</h2>
+            </div>
+            <div class="screen-content">
+                <p>🤖 Hi there! I'm GreetBot, your friendly assistant.</p>
+                <p>Chat functionality will be available soon!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentScreen = 'main-screen';
+        let statusInterval;
+
+        // Initialize the interface
+        document.addEventListener('DOMContentLoaded', function() {
+            startStatusPolling();
+            console.log('GreetBot Interface initialized');
+        });
+
+        // Screen navigation function
+        function showScreen(screenId) {
+            // Hide current screen
+            const currentElement = document.getElementById(currentScreen);
+            if (currentElement) {
+                currentElement.classList.remove('active');
+            }
+
+            // Show new screen
+            const newElement = document.getElementById(screenId);
+            if (newElement) {
+                newElement.classList.add('active');
+                currentScreen = screenId;
+            }
+
+            console.log(`Switched to screen: ${screenId}`);
+        }
+
+        // Status polling function
+        function startStatusPolling() {
+            statusInterval = setInterval(updateRobotStatus, 5000);
+            updateRobotStatus(); // Initial call
+        }
+
+        function updateRobotStatus() {
+            fetch('/robot/status')
+                .then(response => response.json())
+                .then(data => {
+                    const modeElement = document.getElementById('robot-mode');
+                    if (modeElement && data.mode) {
+                        modeElement.textContent = `Mode: ${data.mode}`;
+                    }
+                })
+                .catch(error => {
+                    console.log('Status update failed (this is normal if server is not running)');
+                    // Don't show error to user, just log it
+                });
+        }
+
+        // Replay greeting function
+        /*function replayGreeting() {
+            console.log('Replaying greeting...');
+            
+            // Optional: Set robot mode or trigger greeting
+            fetch('/set_mode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ mode: 'greeting' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Greeting mode set:', data);
+                // Redirect to index.html after a short delay
+                setTimeout(() => {
+                    window.location.href = '/robot/';
+                }, 500);
+            })
+            .catch(error => {
+                console.log('Could not set greeting mode, redirecting anyway');
+                // Redirect even if the API call fails
+                window.location.href = '/robot/';
+            });
+        }*/
+
+        // End talk function
+        function endTalk() {
+            console.log('Ending talk session...');
+            
+            fetch('/phone/api/reset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "reset_done") {
+                    console.log('Reset successful, redirecting...');
+                    window.location.href = '/robot/';
+                } else {
+                    console.error('Reset failed:', data);
+                    alert('Reset failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error during reset:', error);
+                alert('Could not reset robot. Please try again.');
+            });
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (statusInterval) {
+                clearInterval(statusInterval);
+            }
+        });
+
+        // Touch feedback for mobile devices
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.closest('.card')) {
+                e.target.closest('.card').style.transform = 'scale(0.95)';
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            if (e.target.closest('.card')) {
+                setTimeout(() => {
+                    e.target.closest('.card').style.transform = '';
+                }, 150);
+            }
+        });
+    </script>
+</body>
+</html>
